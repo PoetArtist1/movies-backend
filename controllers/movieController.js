@@ -8,17 +8,14 @@ async function fetchTMDB(tmdbId) {
   const res = await axios.get(`${TMDB_URL}/movie/${tmdbId}`, {
     params: { api_key: process.env.TMDB_API_KEY, language: 'es-ES' }
   });
+  console.log(res.data);
   return res.data;
 }
 
 const getMovies = async (req, res) => {
-  const { search = '', category, sortBy = 'tmdb_score', order = 'DESC' } = req.query;
+  const { search = '', sortBy = 'tmdb_score', order = 'DESC' } = req.query;
   let sql = `SELECT * FROM movies WHERE title ILIKE $1`;
   const params = [`%${search}%`];
-  if (category) {
-    sql += ` AND actors ILIKE $${params.length + 1}`; 
-    params.push(`%${category}%`);
-  }
   sql += ` ORDER BY ${sortBy} ${order}`;
   const { rows } = await db.query(sql, params);
   res.json(rows);
